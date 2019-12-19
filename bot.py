@@ -3,6 +3,39 @@ This is an example for a bot.
 """
 from penguin_game import *
 
+
+enemy_icebergs_dic = {}
+ally_icebergs_dic = {}
+
+
+BotState = Enum("BotState", "survival", "expansion")
+
+state = BotState.survival
+
+
+def penguins_to_capture(my_icebergs, iceberg):
+    max_turns = 0
+    for my_iceberg in my_icebergs:
+        if my_iceberg.penguin_amount > iceberg.penguin_amount + (iceberg.penguins_per_turn*my_iceberg.get_turns_till_arrival(iceberg) if iceberg.owner != -1 else 0):
+            return iceberg.penguin_amount + iceberg.penguins_per_turn*my_iceberg.get_turns_till_arrival(iceberg)
+        max_turns = max_turns if max_turns>my_iceberg.get_turns_till_arrival(iceberg) else my_iceberg.get_turns_till_arrival(iceberg)
+
+    return iceberg.penguin_amount + iceberg.penguins_per_turn*max_turns
+
+
+def threat_level(my_icebergs, iceberg):
+    max_turns = 0
+    min_turns = 0
+    for my_iceberg in my_icebergs:
+        max_turns = max_turns if max_turns > my_iceberg.get_turns_till_arrival(
+            iceberg) else my_iceberg.get_turns_till_arrival(iceberg)
+        min_turns = max_turns if min_turns < my_iceberg.get_turns_till_arrival(
+            iceberg) else my_iceberg.get_turns_till_arrival(iceberg)
+    return iceberg.penguin_amount + iceberg.penguins_per_turn * (max_turns-min_turns)
+
+
+
+
 def do_turn(game):
     """
     Makes the bot run a single turn.
@@ -10,8 +43,14 @@ def do_turn(game):
     :param game: the current game state.
     :type game: Game
     """
-    # Go over all of my icebergs.
-    for my_iceberg in game.get_my_icebergs():
+    enemy_icebergs = game.get_enemy_icebergs() + game.get_neutral_icebergs()
+    my_icebergs = game.get_my_icebergs()
+    neutral_icebergs = game.get_neutral_icebergs()
+    for enemy_iceberg in enemy_icebergs:
+        enemy_icebergs_dic[enemy_iceberg] = (penguins_to_capture(my_icebergs, enemy_iceberg), threat_level(my_icebergs, enemy_iceberg))
+    for my_iceberg in my_icebergs:
+        enemy_icebergs_dic[enemy_iceberg] = (penguins_to_capture(enemy_icebergs-neutral_icebergs, my_iceberg), threat_level(enemy_icebergs-neutral_icebergs, my_iceberg))
+    for my_iceberg in my_icebergs:
         # The amount of penguins in my iceberg.
         my_penguin_amount = my_iceberg.penguin_amount  # type: int
 
