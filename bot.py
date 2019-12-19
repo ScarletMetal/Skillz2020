@@ -42,8 +42,11 @@ def do_turn(game):
     """
     enemy_icebergs = game.get_enemy_icebergs() + game.get_neutral_icebergs()
     my_icebergs = game.get_my_icebergs()
+    neutral_icebergs = game.get_neutral_icebergs()
     for enemy_iceberg in enemy_icebergs:
-        enemy_icebergs_dic[enemy_iceberg] = (penguins_to_capture(my_icebergs, enemy_iceberg))
+        enemy_icebergs_dic[enemy_iceberg] = (penguins_to_capture(my_icebergs, enemy_iceberg), threat_level(my_icebergs, enemy_iceberg))
+    for my_iceberg in my_icebergs:
+        enemy_icebergs_dic[enemy_iceberg] = (penguins_to_capture(enemy_icebergs-neutral_icebergs, my_iceberg), threat_level(enemy_icebergs-neutral_icebergs, my_iceberg))
     for my_iceberg in my_icebergs:
         # The amount of penguins in my iceberg.
         my_penguin_amount = my_iceberg.penguin_amount  # type: int
