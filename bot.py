@@ -2,11 +2,6 @@
 This is an example for a bot.
 """
 from penguin_game import *
-from enum import Enum
-
-BotState = Enum("BotState", "survival", "expansion")
-
-state = BotState.survival
 
 
 def do_turn(game):
