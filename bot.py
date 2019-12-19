@@ -3,6 +3,7 @@ This is an example for a bot.
 """
 from penguin_game import *
 
+
 enemy_icebergs_dic = {}
 ally_icebergs_dic = {}
 
@@ -31,6 +32,8 @@ def threat_level(my_icebergs, iceberg):
         min_turns = max_turns if min_turns < my_iceberg.get_turns_till_arrival(
             iceberg) else my_iceberg.get_turns_till_arrival(iceberg)
     return iceberg.penguin_amount + iceberg.penguins_per_turn * (max_turns-min_turns)
+
+
 
 
 def do_turn(game):
@@ -67,3 +70,19 @@ def do_turn(game):
             # Send penguins to the target.
             print my_iceberg, "sends", (destination_penguin_amount + 1), "penguins to", destination
             my_iceberg.send_penguins(destination, destination_penguin_amount + 1)
+
+    def calculate_ideality (capture_rate, threat_level):
+        return threat_level-capture_rate
+
+    def expansion_phase(enemy_icebergs):
+        ideal_for_expansion = list(enemy_icebergs.keys())[0]
+        for enemy_iceberg in enemy_icebergs:
+            max_value = calculate_ideality(enemy_icebergs.get(ideal_for_expansion)[0],
+                                           enemy_icebergs.get(ideal_for_expansion)[1])
+            if calculate_ideality(enemy_icebergs.get(enemy_iceberg)[0], enemy_icebergs.get(enemy_iceberg)[1]) >\
+                    max_value:
+                ideal_for_expansion = enemy_iceberg
+
+        return ideal_for_expansion
+
+
