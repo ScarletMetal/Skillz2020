@@ -9,6 +9,14 @@ BotState = Enum("BotState", "survival", "expansion")
 state = BotState.survival
 
 
+def penguins_to_capture(my_icebergs, iceberg):
+    max_turns = 0
+    for my_iceberg in my_icebergs:
+        if my_iceberg.penguin_amount > iceberg.penguin_amount + iceberg.penguins_per_turn*my_iceberg.get_turns_till_arrival(iceberg):
+            return iceberg.penguin_amount + iceberg.penguins_per_turn*my_iceberg.get_turns_till_arrival(iceberg)
+        max_turns = max_turns if max_turns>my_iceberg.get_turns_till_arrival(iceberg) else my_iceberg.get_turns_till_arrival(iceberg)
+    return iceberg.penguin_amount + iceberg.penguins_per_turn*max_turns
+
 def do_turn(game):
     """
     Makes the bot run a single turn.
